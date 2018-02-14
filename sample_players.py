@@ -161,6 +161,9 @@ class RandomPlayer():
             return (-1, -1)
         return legal_moves[randint(0, len(legal_moves) - 1)]
 
+    def __repr__(self):
+        return 'Random Player'
+
 
 class GreedyPlayer():
     """Player that chooses next move to maximize heuristic score. This is
@@ -197,6 +200,9 @@ class GreedyPlayer():
             return (-1, -1)
         _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
         return move
+
+    def __repr__(self):
+        return 'Greedy Player'
 
 
 class HumanPlayer():
