@@ -10,7 +10,7 @@ class SearchTimeout(Exception):
 
 
 positions = {
-    (0,0): 2, (0,6): 2, (6,0): 2, (6,6): 0,
+    (0,0): 2, (0,6): 2, (6,0): 2, (6,6): 2,
     (0,1): 3, (1,0): 3, (5,0): 3, (6,1): 3, (0,5): 3, (1,6): 3, (6,5): 3, (5,6): 3,
 
     (2,0): 4, (3,0): 4, (4,0): 4,
@@ -96,7 +96,7 @@ def custom_score_2(game, player):
 
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves - 3*opp_moves)
+    return float(3*own_moves - opp_moves)
 
 
 def custom_score_3(game, player):
@@ -127,9 +127,17 @@ def custom_score_3(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(3*own_moves - opp_moves)
+    own_moves = set(game.get_legal_moves(player))
+    opp_moves = set(game.get_legal_moves(game.get_opponent(player)))
+    if game.move_count >= 12:
+        return -2*len(opp_moves)
+
+    common_moves = own_moves.intersection(opp_moves)
+
+    common_moves = len(common_moves)
+    own_moves, opp_moves = len(own_moves) - common_moves, len(opp_moves) - common_moves
+
+    return float(2*own_moves + common_moves - 3*opp_moves)
 
 
 class IsolationPlayer:
@@ -390,7 +398,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         if len(legal_moves) == 0:
             return -1, -1
 
-        best_move = (-1, -1)
+        best_move = legal_moves[0]
         for move in legal_moves:
             v = self.min_value(game.forecast_move(move), depth-1, alpha, beta)
             if v > alpha:
